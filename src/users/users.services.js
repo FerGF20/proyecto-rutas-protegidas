@@ -1,5 +1,6 @@
 const usersControllers = require('./users.controllers')
 const responses = require('../utils/responses.handler')
+const { hashPassword } = require('../utils/crypto')
 
 const getAllUsers = (req, res) => {
     usersControllers.findAllUser()
@@ -157,10 +158,67 @@ const deleteUser = (req, res) => {
         })
 }
 
+const deleteMyUser = (req, res) => {
+
+    const id = req.user.id
+
+    usersControllers.deleteUser(id)
+        .then(data => {
+            responses.success({
+                res,
+                status: 200,
+                message: 'User deleted successfully',
+                data
+            })
+        })
+        .catch(err => {
+            responses.success({
+                res,
+                status: 400,
+                message: 'Error by deleting the user',
+                data: err
+            })
+        })
+
+}
+
+const patchMyUser = (req, res) => {
+    const id = req.user.id 
+    const { firstName, lastName, email, password, profileImage, phone } = req.body 
+    const userObj = {
+        firstName,
+        lastName,
+        email,
+        password: hashPassword(password),
+        profileImage,
+        phone
+    }
+
+    usersControllers.updateUser(id, userObj)
+        .then(data => {
+                responses.success({
+                    status: 200,
+                    data, 
+                    message: 'User modified successfully',
+                    res
+                })
+            })
+        .catch(err => {
+            responses.error({
+                res,
+                status: 400,
+                message: 'Error by trying to update user',
+                data: err
+            })
+        })
+}
+
 module.exports = {
     getAllUsers,
     getUserById,
     postNewUser,
     patchUser,
-    deleteUser
+    deleteUser,
+    deleteMyUser,
+    patchMyUser
 }

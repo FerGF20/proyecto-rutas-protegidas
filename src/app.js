@@ -5,8 +5,10 @@ const express = require('express')
 const config = require('../config')
 const { error, success } =require('./utils/responses.handler')
 const db = require('./utils/database')
+const passportJwt = require('./middlewares/auth.middleware')
 //? Router Imports
 const userRouter = require('./users/users.router')
+const authRouter = require('./auth/auth.router')
 
 //? Initial Configs
 const app = express()
@@ -35,6 +37,7 @@ app.get('/', (req, res) => {
 })
 
 app.use('/api/v1/users', userRouter)
+app.use('/api/v1/auth', authRouter)
 
 //? 404 Error Handler
 app.use('*', (req, res) => {
